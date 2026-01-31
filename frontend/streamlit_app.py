@@ -1,5 +1,5 @@
 """
-Enhanced Streamlit Frontend with Live Microphone Recording
+Enhanced Streamlit Frontend - Cloud Optimized Version
 """
 import streamlit as st
 import requests
@@ -8,7 +8,6 @@ import json
 from pathlib import Path
 import pandas as pd
 import plotly.graph_objects as go
-from streamlit_mic_recorder import mic_recorder
 import io
 
 # Page configuration
@@ -23,18 +22,10 @@ st.set_page_config(
 st.markdown("""
     <style>
     .main {
-        padding: 2rem;
+        padding-top: 2rem;
     }
     .stButton>button {
         width: 100%;
-        background-color: #4CAF50;
-        color: white;
-        height: 3em;
-        border-radius: 10px;
-        font-weight: bold;
-    }
-    .stButton>button:hover {
-        background-color: #45a049;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -64,36 +55,24 @@ with st.sidebar:
         "API Key",
         value=DEFAULT_API_KEY,
         type="password",
-        help="Your secret API key"
+        help="Authentication key"
     )
     
     st.divider()
     
     st.header("ℹ️ About")
-    st.info("""
-    This system uses advanced machine learning to analyze audio features and 
-    determine if a voice is AI-generated or human.
+    st.markdown("""
+    This tool uses advanced AI to detect synthetic voices across multiple languages.
     
     **Supported Languages:**
-    - Tamil (தமிழ்)
-    - English
-    - Hindi (हिन्दी)
-    - Malayalam (മലയാളം)
-    - Telugu (తెలుగు)
-    """)
-    
-    st.divider()
-    
-    st.markdown("""
-    **How it works:**
-    1. Upload MP3 or record live
-    2. Select language
-    3. Get instant results
-    
-    **Accuracy**: 90%+
-    **Max Duration**: 30 seconds
+    - 🇮🇳 Tamil
+    - 🇬🇧 English
+    - 🇮🇳 Hindi
+    - 🇮🇳 Malayalam
+    - 🇮🇳 Telugu
     """)
 
+# Helper Functions
 def analyze_audio(audio_data, language, api_url, api_key):
     """Helper function to analyze audio"""
     try:
@@ -121,96 +100,57 @@ def analyze_audio(audio_data, language, api_url, api_key):
         )
         
         if response.status_code == 200:
-            result = response.json()
-            return result, None
+            return response.json(), None
         elif response.status_code == 401:
-            return None, "Invalid API Key. Please check your credentials in the sidebar."
+            return None, "Invalid API key"
+        elif response.status_code == 400:
+            return None, f"Bad request: {response.json().get('message', 'Unknown error')}"
         else:
-            error_msg = response.json().get('detail', 'Unknown error')
-            return None, f"Error: {error_msg}"
+            return None, f"API error: {response.status_code}"
             
     except requests.exceptions.Timeout:
-        return None, "Request timeout. The server took too long to respond."
+        return None, "Request timed out. Backend might be starting up, please try again."
     except requests.exceptions.ConnectionError:
-        return None, f"Cannot connect to API at {api_url}. Make sure the backend is running."
+        return None, "Cannot connect to backend. Please check API URL."
     except Exception as e:
         return None, f"Unexpected error: {str(e)}"
 
-def analyze_fraud(audio_data, language, api_url, api_key):
-    """Helper function to analyze fraud risk"""
-    try:
-        # Calls the new /api/call-analysis endpoint
-        fraud_url = api_url.replace("/api/voice-detection", "/api/call-analysis")
-        
-        audio_base64 = base64.b64encode(audio_data).decode('utf-8')
-        
-        payload = {
-            "language": language,
-            "audioFormat": "mp3",
-            "audioBase64": audio_base64
-        }
-        
-        headers = {
-            "Content-Type": "application/json",
-            "x-api-key": api_key
-        }
-        
-        response = requests.post(
-            fraud_url,
-            json=payload,
-            headers=headers,
-            timeout=30
-        )
-        
-        if response.status_code == 200:
-            return response.json(), None
-        else:
-            return None, response.json().get('detail', 'Unknown error')
-            
-    except Exception as e:
-        return None, str(e)
-
 def display_results(result):
-    """Display analysis results"""
-    st.success("✅ Analysis Complete!")
+    """Display analysis results in a nice format"""
+    classification = result.get('classification', 'UNKNOWN')
+    confidence = result.get('confidenceScore', 0.0)
+    explanation = result.get('explanation', 'No explanation provided')
     
-    # Results in columns
-    res_col1, res_col2 = st.columns(2)
+    # Color coding
+    if classification == 'AI_GENERATED':
+        color = 'red'
+        icon = '🤖'
+    else:
+        color = 'green'
+        icon = '👤'
     
-    with res_col1:
-        if result['classification'] == 'AI_GENERATED':
-            st.metric(
-                "Classification",
-                "🤖 AI Generated",
-                delta="Synthetic Voice"
-            )
-        else:
-            st.metric(
-                "Classification",
-                "👤 Human Voice",
-                delta="Natural Voice"
-            )
-    
-    with res_col2:
-        confidence_pct = result['confidenceScore'] * 100
-        st.metric(
-            "Confidence Score",
-            f"{confidence_pct:.1f}%"
-        )
+    # Display banner
+    st.markdown(f"""
+    <div style='padding: 20px; border-radius: 10px; background-color: {color}20; border-left: 5px solid {color};'>
+        <h2 style='color: {color}; margin: 0;'>{icon} {classification.replace('_', ' ')}</h2>
+        <p style='font-size: 24px; margin: 10px 0;'><strong>Confidence: {confidence*100:.1f}%</strong></p>
+        <p style='margin: 0;'>{explanation}</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Confidence gauge
     fig = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=confidence_pct,
-        title={'text': "Confidence Level", 'font': {'size': 24}},
-        number={'suffix': "%", 'font': {'size': 40}},
-        gauge={
-            'axis': {'range': [0, 100]},
-            'bar': {'color': "darkgreen" if confidence_pct > 70 else "orange"},
+        mode = "gauge+number",
+        value = confidence * 100,
+        domain = {'x': [0, 1], 'y': [0, 1]},
+        title = {'text': "Confidence Score"},
+        gauge = {
+            'axis': {'range': [None, 100]},
+            'bar': {'color': color},
             'steps': [
                 {'range': [0, 50], 'color': "lightgray"},
                 {'range': [50, 75], 'color': "gray"},
-                {'range': [75, 100], 'color': "lightgreen"}
+                {'range': [75, 100], 'color': "darkgray"}
             ],
             'threshold': {
                 'line': {'color': "red", 'width': 4},
@@ -220,21 +160,16 @@ def display_results(result):
         }
     ))
     
-    fig.update_layout(height=350)
+    fig.update_layout(height=300)
     st.plotly_chart(fig, use_container_width=True)
-    
-    # Explanation
-    st.info(f"**Explanation:** {result['explanation']}")
     
     # Full results
     with st.expander("📄 View Full Results"):
         st.json(result)
 
-# Main content
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+# Main content - Simplified for cloud deployment
+tab1, tab2, tab3 = st.tabs([
     "🎵 Upload Audio", 
-    "🎙️ Live Recording", 
-    "🛡️ Call Analyzer",
     "📊 Batch Analysis", 
     "📖 API Documentation"
 ])
@@ -284,95 +219,23 @@ with tab1:
                         st.error(f"❌ {error}")
 
 
-with tab3:
-    st.subheader("🛡️ Real-time Call Security Analyzer")
-    st.info("Detect spam, fraud, and synthetic voices in real-time")
-    
-    col1, col2 = st.columns([1, 1])
-    
-    with col1:
-        st.markdown("### 📞 Call Simulation")
-        record_lang_fraud = st.selectbox("Call Language", ["English", "Tamil", "Hindi", "Telugu"], key="fraud_lang")
-        
-        audio_data_fraud = mic_recorder(
-            start_prompt="📞 Start Call",
-            stop_prompt="📴 End Call",
-            key="fraud_recorder"
-        )
-        
-        if audio_data_fraud:
-            audio_bytes = audio_data_fraud['bytes']
-            st.audio(audio_bytes, format='audio/wav')
-            if st.button("🛡️ Scan for Threats", type="primary", key="scan_fraud"):
-                with st.spinner("Analyzing call patterns..."):
-                    result, error = analyze_fraud(audio_bytes, record_lang_fraud, api_url, api_key)
-                    
-                    if result:
-                        # Display Fraud Results
-                        risk_score = result['fraud_analysis']['risk_score']
-                        risk_level = result['fraud_analysis']['risk_level']
-                        
-                        # Risk Banner
-                        color = "green"
-                        if risk_level == "HIGH": color = "orange"
-                        if risk_level == "CRITICAL": color = "red"
-                        
-                        st.markdown(f"""
-                        <div style='background-color: {color}; padding: 20px; border-radius: 10px; color: white; text-align: center; margin-bottom: 20px;'>
-                            <h2 style='margin:0'>THREAT LEVEL: {risk_level}</h2>
-                            <p style='margin:0; font-size: 1.2em'>Risk Score: {risk_score}/100</p>
-                        </div>
-                        """, unsafe_allow_html=True)
-                        
-                        c1, c2 = st.columns(2)
-                        with c1:
-                            st.metric("AI Call Probability", f"{result['fraud_analysis']['metrics']['ai_probability']}%")
-                        with c2:
-                            st.metric("Urgency Score", f"{result['fraud_analysis']['metrics']['urgency_score']}%")
-                            
-                        # Alerts
-                        st.subheader("⚠️ Detected Threats")
-                        alerts = result['fraud_analysis']['alerts']
-                        if alerts:
-                            for alert in alerts:
-                                st.error(alert)
-                        else:
-                            st.success("✅ No immediate threats detected")
-                            
-                        # Transcript Display for Debugging
-                        with st.expander("📝 Call Transcript", expanded=True):
-                            transcript_data = result.get('transcript_data', {})
-                            transcript_text = transcript_data.get('transcript', 'No transcript available')
-                            keywords = transcript_data.get('keywords_found', [])
-                            
-                            st.markdown(f"**Recognized Text:**")
-                            st.info(transcript_text)
-                            
-                            if keywords:
-                                st.markdown(f"**Keywords Matched:** `{'`, `'.join(keywords)}`")
-                            else:
-                                st.markdown("**Keywords Matched:** None")
-                                
-                        with st.expander("🔍 Detailed Analysis"):
-                            st.json(result)
-                    else:
-                        st.error(error)
-    
     with col2:
+        st.subheader("📋 How It Works")
         st.markdown("""
         ### 🛡️ Protection Features
         
         **1. Synthetic Voice Prevention**
         Detects if the caller is using AI/Deepfake technology.
         
-        **2. Behavioral Analysis**
-        Identifies pressure tactics, urgency, and aggressive speech patterns common in scams.
+        **2. Multi-Language Support**
+        Works across 5 Indian and international languages.
         
-        **3. Keyword Monitoring**
-        (Coming Soon) Real-time keyword scanning for 'password', 'OTP', 'bank'.
+        **3. Fast Analysis**
+        Results in seconds with detailed confidence scores.
         """)
     
-    with col2:
+        st.divider()
+        
         st.subheader("📋 Quick Guide")
         st.markdown("""
         **Steps:**
@@ -400,87 +263,6 @@ with tab3:
         """)
 
 with tab2:
-    st.subheader("🎙️ Live Voice Recording")
-    st.info("Record your voice directly from your microphone for instant analysis!")
-    
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        # Language selection for recording
-        record_language = st.selectbox(
-            "Select Language",
-            ["English", "Tamil", "Hindi", "Malayalam", "Telugu"],
-            help="Language of your voice",
-            key="record_lang"
-        )
-        
-        st.markdown("### 🎤 Click below to start recording:")
-        
-        st.markdown("### 🎤 Click below to start recording:")
-        
-        # Audio recorder widget (streamlit-mic-recorder)
-        audio_data = mic_recorder(
-            start_prompt="Start Recording",
-            stop_prompt="Stop Recording",
-            key="recorder"
-        )
-        
-        if audio_data:
-            audio_bytes = audio_data['bytes']
-            st.audio(audio_bytes, format='audio/wav')
-            
-            col_a, col_b = st.columns([1, 1])
-            
-            with col_a:
-                if st.button("🔍 Analyze Recording", type="primary", key="analyze_recording"):
-                    with st.spinner("Analyzing your voice... This may take a few seconds..."):
-                        result, error = analyze_audio(audio_bytes, record_language, api_url, api_key)
-                        
-                        if result:
-                            display_results(result)
-                            
-                            # Download results
-                            st.download_button(
-                                label="📥 Download Results (JSON)",
-                                data=json.dumps(result, indent=2),
-                                file_name=f"live_analysis_{record_language}.json",
-                                mime="application/json",
-                                key="download_recording"
-                            )
-                        else:
-                            st.error(f"❌ {error}")
-            
-            with col_b:
-                if st.button("🔄 Record Again", key="record_again"):
-                    st.rerun()
-    
-    with col2:
-        st.subheader("🎙️ Recording Tips")
-        st.markdown("""
-        **For best results:**
-        - 🔇 Find a quiet environment
-        - 🎯 Speak clearly
-        - 📏 Keep 5-30 seconds
-        - 🎚️ Use good microphone
-        
-        **What to say:**
-        - Read a sentence
-        - Introduce yourself
-        - Natural conversation
-        - Any speech sample
-        """)
-        
-        st.divider()
-        
-        st.success("""
-        **Live Recording Benefits:**
-        - ⚡ Instant analysis
-        - 🚫 No file upload needed
-        - 🎤 Direct from mic
-        - 🔒 Privacy-friendly
-        """)
-
-with tab3:
     st.subheader("📊 Batch Analysis")
     st.info("Upload multiple audio files for batch processing")
     
@@ -553,7 +335,7 @@ with tab3:
                 "text/csv"
             )
 
-with tab4:
+with tab3:
     st.subheader("📖 API Documentation")
     
     st.markdown("""
@@ -613,21 +395,15 @@ with tab4:
         }
     )
     
-    result = response.json()
-    print(f"Classification: {result['classification']}")
-    print(f"Confidence: {result['confidenceScore']}")
+    print(response.json())
     ```
     
-    ### Example with cURL
-    ```bash
-    curl -X POST http://localhost:8000/api/voice-detection \\
-      -H "Content-Type: application/json" \\
-      -H "x-api-key: YOUR_API_KEY" \\
-      -d '{
-        "language": "English",
-        "audioFormat": "mp3",
-        "audioBase64": "BASE64_STRING..."
-      }'
+    ### Error Response
+    ```json
+    {
+        "status": "error",
+        "message": "Invalid API key or malformed request"
+    }
     ```
     """)
 
@@ -635,8 +411,6 @@ with tab4:
 st.divider()
 st.markdown("""
 <div style='text-align: center; color: gray;'>
-    <p>AI Voice Detection System v1.0 | Built with FastAPI & Streamlit</p>
-    <p>Supports Tamil, English, Hindi, Malayalam, and Telugu</p>
-    <p>✨ NEW: Live microphone recording feature!</p>
+    <p>🎤 AI Voice Detection System | Powered by Advanced Machine Learning</p>
 </div>
 """, unsafe_allow_html=True)
