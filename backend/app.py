@@ -246,4 +246,4 @@ if __name__ == "__main__":
     print(f"Docs: http://{host}:{port}/docs")
     print(f"API Key: {os.getenv('API_KEY', 'sk_test_voice_detection_2026')}\n")
     
-    uvicorn.run(app, host=host, port=port, reload=True)
+    uvicorn.run(app, host=host, port=port)
