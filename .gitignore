@@ -16,8 +16,9 @@ ENV/
 *.swo
 
 # Model files (large)
-models/*.pt
-models/*.pkl
+# Model files (large)
+# models/*.pt
+# models/*.pkl
 
 # Data files
 data/
