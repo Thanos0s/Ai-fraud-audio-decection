@@ -1,30 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Voice Detection System</title>
-    
+
     <!-- CSS -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/animations.css">
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
     <script src="https://www.webrtc-experiment.com/RecordRTC.js"></script>
 </head>
+
 <body>
     <!-- Particle Background -->
     <div id="particles-bg"></div>
-    
+
     <!-- Header -->
     <header class="header">
         <div class="container">
@@ -35,6 +37,11 @@
         </div>
     </header>
 
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle sidebar-open" id="sidebar-toggle">
+        ☰
+    </button>
+
     <!-- Main Content -->
     <main class="main-content">
         <div class="container">
@@ -42,27 +49,17 @@
             <aside class="sidebar">
                 <div class="card">
                     <h3 class="sidebar-title">⚙️ Configuration</h3>
-                    
+
                     <div class="form-group">
                         <label for="api-url">API Endpoint</label>
-                        <input 
-                            type="text" 
-                            id="api-url" 
-                            class="input" 
-                            value="http://localhost:8000/api/voice-detection"
-                            placeholder="Backend API URL"
-                        >
+                        <input type="text" id="api-url" class="input" value="http://localhost:8000/api/voice-detection"
+                            placeholder="Backend API URL">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="api-key">API Key</label>
-                        <input 
-                            type="password" 
-                            id="api-key" 
-                            class="input" 
-                            value="sk_test_voice_detection_2026"
-                            placeholder="Authentication key"
-                        >
+                        <input type="password" id="api-key" class="input" value="sk_test_voice_detection_2026"
+                            placeholder="Authentication key">
                     </div>
                 </div>
 
@@ -71,7 +68,7 @@
                     <p class="sidebar-text">
                         Advanced AI system to detect synthetic voices across 5 languages.
                     </p>
-                    
+
                     <div class="language-list">
                         <span class="language-badge">🇮🇳 Tamil</span>
                         <span class="language-badge">🇬🇧 English</span>
@@ -110,7 +107,7 @@
                         <div class="grid-2">
                             <div class="card">
                                 <h2 class="card-title">Upload Voice Sample</h2>
-                                
+
                                 <div class="form-group">
                                     <label for="upload-language">Select Language</label>
                                     <select id="upload-language" class="select">
@@ -152,7 +149,7 @@
 
                             <div class="card">
                                 <h3 class="card-title">📋 How It Works</h3>
-                                
+
                                 <div class="info-section">
                                     <h4>🛡️ Protection Features</h4>
                                     <ul class="feature-list">
@@ -346,7 +343,7 @@
                     <div id="docs-tab" class="tab-pane">
                         <div class="card">
                             <h2 class="card-title">📖 API Documentation</h2>
-                            
+
                             <div class="docs-section">
                                 <h3>Endpoint</h3>
                                 <pre class="code-block">POST /api/voice-detection</pre>
@@ -425,4 +422,5 @@ console.log(response.data);</pre>
     <script src="js/fraud-analyzer.js"></script>
     <script src="js/3d-visualizer.js"></script>
 </body>
+
 </html>

@@ -3,42 +3,43 @@
    =================================== */
 
 :root {
-    /* Streamlit-inspired Color Palette */
+    /* Streamlit Dark Theme Color Palette */
     --primary: #FF4B4B;
     --secondary: #0068C9;
-    --success: #09AB3B;
-    --warning: #FFA500;
+    --success: #21C354;
+    --warning: #FFA421;
     --danger: #FF4B4B;
-    
-    /* Backgrounds */
-    --bg-primary: #FFFFFF;
-    --bg-secondary: #F0F2F6;
-    --bg-dark: #262730;
-    --bg-card: #FFFFFF;
-    
+
+    /* Backgrounds - Streamlit Dark */
+    --bg-primary: #0E1117;
+    --bg-secondary: #262730;
+    --bg-dark: #0E1117;
+    --bg-card: #262730;
+    --bg-sidebar: #0E1117;
+
     /* Text Colors */
-    --text-primary: #262730;
-    --text-secondary: #808495;
+    --text-primary: #FAFAFA;
+    --text-secondary: #A3A8B4;
     --text-light: #FAFAFA;
-    
+
     /* Borders */
-    --border-color: #E6E9EF;
+    --border-color: #3D4455;
     --border-radius: 8px;
     --border-radius-sm: 4px;
     --border-radius-lg: 12px;
-    
+
     /* Spacing (8px grid system) */
     --spacing-1: 8px;
     --spacing-2: 16px;
     --spacing-3: 24px;
     --spacing-4: 32px;
     --spacing-5: 40px;
-    
+
     /* Shadows */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-    --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
-    --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
-    
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+
     /* Typography */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-size-sm: 14px;
@@ -46,7 +47,7 @@
     --font-size-lg: 18px;
     --font-size-xl: 24px;
     --font-size-2xl: 32px;
-    
+
     /* Transitions */
     --transition: 0.2s ease;
 }
@@ -72,7 +73,7 @@ body {
     font-size: var(--font-size-base);
     line-height: 1.6;
     color: var(--text-primary);
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-primary);
     min-height: 100vh;
     position: relative;
 }
@@ -99,9 +100,10 @@ body {
    =================================== */
 
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--bg-sidebar);
+    border-bottom: 1px solid var(--border-color);
     color: var(--text-light);
-    padding: var(--spacing-4) 0;
+    padding: var(--spacing-3) 0;
     position: relative;
     overflow: hidden;
 }
@@ -160,6 +162,41 @@ body {
 .sidebar {
     position: sticky;
     top: var(--spacing-3);
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    padding: var(--spacing-3);
+    transition: all 0.3s ease;
+    min-width: 300px;
+}
+
+.sidebar.collapsed {
+    min-width: 0;
+    max-width: 0;
+    padding: 0;
+    overflow: hidden;
+    border-right: none;
+}
+
+.sidebar-toggle {
+    position: fixed;
+    top: 80px;
+    left: 10px;
+    z-index: 1000;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: left 0.3s ease;
+}
+
+.sidebar-toggle.sidebar-open {
+    left: 310px;
+}
+
+.sidebar-toggle:hover {
+    background: var(--bg-secondary);
 }
 
 .sidebar-title {
@@ -185,7 +222,8 @@ body {
 .language-badge {
     display: inline-block;
     padding: var(--spacing-1) var(--spacing-2);
-    background: var(--bg-secondary);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: var(--border-radius-sm);
     font-size: var(--font-size-sm);
     font-weight: 500;
@@ -198,7 +236,7 @@ body {
 .main-panel {
     background: var(--bg-card);
     border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
     overflow: hidden;
 }
 
@@ -208,8 +246,8 @@ body {
 
 .tabs {
     display: flex;
-    background: var(--bg-secondary);
-    border-bottom: 2px solid var(--border-color);
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
     overflow-x: auto;
 }
 
@@ -276,15 +314,37 @@ body {
    Utility Classes
    =================================== */
 
-.mt-1 { margin-top: var(--spacing-1); }
-.mt-2 { margin-top: var(--spacing-2); }
-.mt-3 { margin-top: var(--spacing-3); }
-.mt-4 { margin-top: var(--spacing-4); }
+.mt-1 {
+    margin-top: var(--spacing-1);
+}
 
-.mb-1 { margin-bottom: var(--spacing-1); }
-.mb-2 { margin-bottom: var(--spacing-2); }
-.mb-3 { margin-bottom: var(--spacing-3); }
-.mb-4 { margin-bottom: var(--spacing-4); }
+.mt-2 {
+    margin-top: var(--spacing-2);
+}
+
+.mt-3 {
+    margin-top: var(--spacing-3);
+}
+
+.mt-4 {
+    margin-top: var(--spacing-4);
+}
+
+.mb-1 {
+    margin-bottom: var(--spacing-1);
+}
+
+.mb-2 {
+    margin-bottom: var(--spacing-2);
+}
+
+.mb-3 {
+    margin-bottom: var(--spacing-3);
+}
+
+.mb-4 {
+    margin-bottom: var(--spacing-4);
+}
 
 .hidden {
     display: none !important;
@@ -298,11 +358,11 @@ body {
     .main-content .container {
         grid-template-columns: 1fr;
     }
-    
+
     .sidebar {
         position: static;
     }
-    
+
     .grid-2 {
         grid-template-columns: 1fr;
     }
@@ -313,11 +373,11 @@ body {
         --font-size-2xl: 24px;
         --font-size-xl: 20px;
     }
-    
+
     .tabs {
         overflow-x: scroll;
     }
-    
+
     .tab-btn {
         font-size: var(--font-size-sm);
         padding: var(--spacing-2);
