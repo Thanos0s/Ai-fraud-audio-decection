@@ -20,4 +20,6 @@ COPY models/ ./models/
 EXPOSE 8000
 
 # Run application
-CMD ["uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run application via Python to respect environment variables in main block
+ENV PYTHONPATH=/app
+CMD ["python", "backend/app.py"]
