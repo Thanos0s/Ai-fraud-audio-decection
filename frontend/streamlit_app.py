@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 import pandas as pd
 import plotly.graph_objects as go
-from audio_recorder_streamlit import audio_recorder
+from streamlit_mic_recorder import mic_recorder
 import io
 
 # Page configuration
@@ -294,16 +294,15 @@ with tab3:
         st.markdown("### 📞 Call Simulation")
         record_lang_fraud = st.selectbox("Call Language", ["English", "Tamil", "Hindi", "Telugu"], key="fraud_lang")
         
-        audio_bytes = audio_recorder(
-            text="Simulate Call Audio",
-            recording_color="#e74c3c",
-            neutral_color="#6aa36f",
-            icon_name="phone",
-            icon_size="3x",
-            key="fraud_recorder"
+        audio_data_fraud = mic_recorder(
+            start_prompt="📞 Start Call",
+            stop_prompt="📴 End Call",
+            key="fraud_recorder",
+            format="wav"
         )
         
-        if audio_bytes:
+        if audio_data_fraud:
+            audio_bytes = audio_data_fraud['bytes']
             st.audio(audio_bytes, format='audio/wav')
             if st.button("🛡️ Scan for Threats", type="primary", key="scan_fraud"):
                 with st.spinner("Analyzing call patterns..."):
@@ -418,16 +417,18 @@ with tab2:
         
         st.markdown("### 🎤 Click below to start recording:")
         
-        # Audio recorder widget
-        audio_bytes = audio_recorder(
-            text="Click to record",
-            recording_color="#e74c3c",
-            neutral_color="#6aa36f",
-            icon_name="microphone",
-            icon_size="3x",
+        st.markdown("### 🎤 Click below to start recording:")
+        
+        # Audio recorder widget (streamlit-mic-recorder)
+        audio_data = mic_recorder(
+            start_prompt="Start Recording",
+            stop_prompt="Stop Recording",
+            key="recorder",
+            format="wav"
         )
         
-        if audio_bytes:
+        if audio_data:
+            audio_bytes = audio_data['bytes']
             st.audio(audio_bytes, format='audio/wav')
             
             col_a, col_b = st.columns([1, 1])
