@@ -1,0 +1,325 @@
+/* ===================================
+   Design System & Global Styles
+   =================================== */
+
+:root {
+    /* Streamlit-inspired Color Palette */
+    --primary: #FF4B4B;
+    --secondary: #0068C9;
+    --success: #09AB3B;
+    --warning: #FFA500;
+    --danger: #FF4B4B;
+    
+    /* Backgrounds */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F0F2F6;
+    --bg-dark: #262730;
+    --bg-card: #FFFFFF;
+    
+    /* Text Colors */
+    --text-primary: #262730;
+    --text-secondary: #808495;
+    --text-light: #FAFAFA;
+    
+    /* Borders */
+    --border-color: #E6E9EF;
+    --border-radius: 8px;
+    --border-radius-sm: 4px;
+    --border-radius-lg: 12px;
+    
+    /* Spacing (8px grid system) */
+    --spacing-1: 8px;
+    --spacing-2: 16px;
+    --spacing-3: 24px;
+    --spacing-4: 32px;
+    --spacing-5: 40px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+    
+    /* Typography */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-size-sm: 14px;
+    --font-size-base: 16px;
+    --font-size-lg: 18px;
+    --font-size-xl: 24px;
+    --font-size-2xl: 32px;
+    
+    /* Transitions */
+    --transition: 0.2s ease;
+}
+
+/* ===================================
+   Reset & Base Styles
+   =================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    min-height: 100vh;
+    position: relative;
+}
+
+/* ===================================
+   Layout
+   =================================== */
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-3);
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-3);
+}
+
+/* ===================================
+   Header
+   =================================== */
+
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: var(--text-light);
+    padding: var(--spacing-4) 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.header-content {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.logo {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-1);
+}
+
+.tagline {
+    font-size: var(--font-size-base);
+    opacity: 0.95;
+    font-weight: 300;
+}
+
+/* ===================================
+   Particle Background
+   =================================== */
+
+#particles-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ===================================
+   Main Content Layout
+   =================================== */
+
+.main-content {
+    padding: var(--spacing-4) 0;
+}
+
+.main-content .container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: var(--spacing-3);
+    align-items: start;
+}
+
+/* ===================================
+   Sidebar
+   =================================== */
+
+.sidebar {
+    position: sticky;
+    top: var(--spacing-3);
+}
+
+.sidebar-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-2);
+    color: var(--text-primary);
+}
+
+.sidebar-text {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+.language-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+    margin-top: var(--spacing-2);
+}
+
+.language-badge {
+    display: inline-block;
+    padding: var(--spacing-1) var(--spacing-2);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+/* ===================================
+   Main Panel
+   =================================== */
+
+.main-panel {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+/* ===================================
+   Tabs
+   =================================== */
+
+.tabs {
+    display: flex;
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-color);
+    overflow-x: auto;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: var(--spacing-2) var(--spacing-3);
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    background: rgba(255, 75, 75, 0.05);
+    color: var(--text-primary);
+}
+
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: var(--bg-card);
+}
+
+/* ===================================
+   Tab Content
+   =================================== */
+
+.tab-content {
+    padding: var(--spacing-4);
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* ===================================
+   Footer
+   =================================== */
+
+.footer {
+    background: var(--bg-dark);
+    color: var(--text-light);
+    text-align: center;
+    padding: var(--spacing-3);
+    margin-top: var(--spacing-5);
+}
+
+.footer p {
+    opacity: 0.8;
+    font-size: var(--font-size-sm);
+}
+
+/* ===================================
+   Utility Classes
+   =================================== */
+
+.mt-1 { margin-top: var(--spacing-1); }
+.mt-2 { margin-top: var(--spacing-2); }
+.mt-3 { margin-top: var(--spacing-3); }
+.mt-4 { margin-top: var(--spacing-4); }
+
+.mb-1 { margin-bottom: var(--spacing-1); }
+.mb-2 { margin-bottom: var(--spacing-2); }
+.mb-3 { margin-bottom: var(--spacing-3); }
+.mb-4 { margin-bottom: var(--spacing-4); }
+
+.hidden {
+    display: none !important;
+}
+
+/* ===================================
+   Responsive Design
+   =================================== */
+
+@media (max-width: 1024px) {
+    .main-content .container {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar {
+        position: static;
+    }
+    
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --font-size-2xl: 24px;
+        --font-size-xl: 20px;
+    }
+    
+    .tabs {
+        overflow-x: scroll;
+    }
+    
+    .tab-btn {
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-2);
+    }
+}

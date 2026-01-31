@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice Detection System</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
+    <script src="https://www.webrtc-experiment.com/RecordRTC.js"></script>
+</head>
+<body>
+    <!-- Particle Background -->
+    <div id="particles-bg"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🎤 AI Voice Detection</h1>
+                <p class="tagline">Advanced Multi-Language Voice Authentication System</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Configuration Sidebar -->
+            <aside class="sidebar">
+                <div class="card">
+                    <h3 class="sidebar-title">⚙️ Configuration</h3>
+                    
+                    <div class="form-group">
+                        <label for="api-url">API Endpoint</label>
+                        <input 
+                            type="text" 
+                            id="api-url" 
+                            class="input" 
+                            value="http://localhost:8000/api/voice-detection"
+                            placeholder="Backend API URL"
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="api-key">API Key</label>
+                        <input 
+                            type="password" 
+                            id="api-key" 
+                            class="input" 
+                            value="sk_test_voice_detection_2026"
+                            placeholder="Authentication key"
+                        >
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <h3 class="sidebar-title">ℹ️ About</h3>
+                    <p class="sidebar-text">
+                        Advanced AI system to detect synthetic voices across 5 languages.
+                    </p>
+                    
+                    <div class="language-list">
+                        <span class="language-badge">🇮🇳 Tamil</span>
+                        <span class="language-badge">🇬🇧 English</span>
+                        <span class="language-badge">🇮🇳 Hindi</span>
+                        <span class="language-badge">🇮🇳 Malayalam</span>
+                        <span class="language-badge">🇮🇳 Telugu</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Panel -->
+            <section class="main-panel">
+                <!-- Tab Navigation -->
+                <nav class="tabs">
+                    <button class="tab-btn active" data-tab="upload">
+                        📤 Upload Audio
+                    </button>
+                    <button class="tab-btn" data-tab="record">
+                        🎙️ Live Recording
+                    </button>
+                    <button class="tab-btn" data-tab="security">
+                        🛡️ Call Security
+                    </button>
+                    <button class="tab-btn" data-tab="batch">
+                        📊 Batch Analysis
+                    </button>
+                    <button class="tab-btn" data-tab="docs">
+                        📖 API Docs
+                    </button>
+                </nav>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- Tab 1: Upload Audio -->
+                    <div id="upload-tab" class="tab-pane active">
+                        <div class="grid-2">
+                            <div class="card">
+                                <h2 class="card-title">Upload Voice Sample</h2>
+                                
+                                <div class="form-group">
+                                    <label for="upload-language">Select Language</label>
+                                    <select id="upload-language" class="select">
+                                        <option value="English">English</option>
+                                        <option value="Tamil">Tamil</option>
+                                        <option value="Hindi">Hindi</option>
+                                        <option value="Malayalam">Malayalam</option>
+                                        <option value="Telugu">Telugu</option>
+                                    </select>
+                                </div>
+
+                                <div class="upload-area" id="upload-area">
+                                    <input type="file" id="audio-file" accept=".mp3" hidden>
+                                    <div class="upload-placeholder">
+                                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                        <p class="upload-text">
+                                            <strong>Click to upload</strong> or drag and drop
+                                        </p>
+                                        <p class="upload-hint">MP3 files only (max 30 seconds)</p>
+                                    </div>
+                                </div>
+
+                                <audio id="audio-preview" controls class="audio-player hidden"></audio>
+
+                                <button id="analyze-btn" class="btn btn-primary btn-block hidden">
+                                    <span class="btn-icon">🔍</span>
+                                    Analyze Voice
+                                </button>
+
+                                <div class="loading hidden" id="loading">
+                                    <div class="spinner"></div>
+                                    <p>Analyzing audio...</p>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <h3 class="card-title">📋 How It Works</h3>
+                                
+                                <div class="info-section">
+                                    <h4>🛡️ Protection Features</h4>
+                                    <ul class="feature-list">
+                                        <li>Synthetic voice detection</li>
+                                        <li>Multi-language support</li>
+                                        <li>Real-time analysis</li>
+                                        <li>Detailed confidence scores</li>
+                                    </ul>
+                                </div>
+
+                                <div class="info-section">
+                                    <h4>📋 Quick Guide</h4>
+                                    <ol class="step-list">
+                                        <li>Select language</li>
+                                        <li>Upload MP3 file</li>
+                                        <li>Click "Analyze Voice"</li>
+                                        <li>View results</li>
+                                    </ol>
+                                </div>
+
+                                <div class="requirements-box">
+                                    <p><strong>Requirements:</strong></p>
+                                    <ul>
+                                        <li>📁 MP3 format only</li>
+                                        <li>⏱️ Max 30 seconds</li>
+                                        <li>🎵 Clear audio quality</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Results Section -->
+                        <div id="results-section" class="results-section hidden">
+                            <!-- Results will be dynamically inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Live Recording -->
+                    <div id="record-tab" class="tab-pane">
+                        <div class="card">
+                            <h2 class="card-title">🎙️ Live Voice Recording</h2>
+                            <p class="card-subtitle">Record your voice directly from your microphone</p>
+
+                            <div class="form-group">
+                                <label for="record-language">Select Language</label>
+                                <select id="record-language" class="select">
+                                    <option value="English">English</option>
+                                    <option value="Tamil">Tamil</option>
+                                    <option value="Hindi">Hindi</option>
+                                    <option value="Malayalam">Malayalam</option>
+                                    <option value="Telugu">Telugu</option>
+                                </select>
+                            </div>
+
+                            <!-- 3D Waveform Visualizer -->
+                            <div id="waveform-container" class="waveform-container">
+                                <canvas id="waveform-canvas"></canvas>
+                            </div>
+
+                            <div class="recording-controls">
+                                <button id="start-record-btn" class="btn btn-danger btn-large">
+                                    <span class="btn-icon">⏺</span>
+                                    Start Recording
+                                </button>
+                                <button id="stop-record-btn" class="btn btn-secondary btn-large hidden">
+                                    <span class="btn-icon">⏹</span>
+                                    Stop Recording
+                                </button>
+                                <div id="recording-timer" class="recording-timer hidden">0:00</div>
+                            </div>
+
+                            <audio id="recorded-audio" controls class="audio-player hidden"></audio>
+
+                            <button id="analyze-recorded-btn" class="btn btn-primary btn-block hidden">
+                                <span class="btn-icon">🔍</span>
+                                Analyze Recording
+                            </button>
+                        </div>
+
+                        <!-- Recording Tips -->
+                        <div class="card mt-3">
+                            <h3 class="card-title">🎙️ Recording Tips</h3>
+                            <ul class="tip-list">
+                                <li>🔇 Find a quiet environment</li>
+                                <li>🎯 Speak clearly and naturally</li>
+                                <li>📏 Keep recording 5-30 seconds</li>
+                                <li>🎚️ Use a good quality microphone</li>
+                            </ul>
+                        </div>
+
+                        <!-- Results for recording -->
+                        <div id="record-results-section" class="results-section hidden"></div>
+                    </div>
+
+                    <!-- Tab 3: Call Security Analyzer -->
+                    <div id="security-tab" class="tab-pane">
+                        <div class="card">
+                            <h2 class="card-title">🛡️ Real-time Call Security Analyzer</h2>
+                            <p class="card-subtitle">Detect fraud, spam, and synthetic voices</p>
+
+                            <div class="form-group">
+                                <label for="security-language">Call Language</label>
+                                <select id="security-language" class="select">
+                                    <option value="English">English</option>
+                                    <option value="Tamil">Tamil</option>
+                                    <option value="Hindi">Hindi</option>
+                                    <option value="Telugu">Telugu</option>
+                                </select>
+                            </div>
+
+                            <!-- Upload or Record for Security Analysis -->
+                            <div class="security-input-options">
+                                <button id="security-upload-btn" class="btn btn-secondary">
+                                    📤 Upload Audio
+                                </button>
+                                <button id="security-record-btn" class="btn btn-secondary">
+                                    🎙️ Record Call
+                                </button>
+                            </div>
+
+                            <input type="file" id="security-file" accept=".mp3" hidden>
+                            <audio id="security-audio-preview" controls class="audio-player hidden"></audio>
+
+                            <button id="scan-threats-btn" class="btn btn-danger btn-block hidden">
+                                <span class="btn-icon">🛡️</span>
+                                Scan for Threats
+                            </button>
+
+                            <!-- 3D Risk Sphere -->
+                            <div id="risk-sphere-container" class="risk-sphere-container hidden">
+                                <canvas id="risk-sphere-canvas"></canvas>
+                            </div>
+
+                            <!-- Security Results -->
+                            <div id="security-results" class="security-results hidden"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Batch Analysis -->
+                    <div id="batch-tab" class="tab-pane">
+                        <div class="card">
+                            <h2 class="card-title">📊 Batch Analysis</h2>
+                            <p class="card-subtitle">Upload multiple audio files for batch processing</p>
+
+                            <div class="form-group">
+                                <label for="batch-language">Select Language (All Files)</label>
+                                <select id="batch-language" class="select">
+                                    <option value="English">English</option>
+                                    <option value="Tamil">Tamil</option>
+                                    <option value="Hindi">Hindi</option>
+                                    <option value="Malayalam">Malayalam</option>
+                                    <option value="Telugu">Telugu</option>
+                                </select>
+                            </div>
+
+                            <div class="upload-area" id="batch-upload-area">
+                                <input type="file" id="batch-files" accept=".mp3" multiple hidden>
+                                <div class="upload-placeholder">
+                                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    <p class="upload-text">
+                                        <strong>Click to upload multiple files</strong>
+                                    </p>
+                                    <p class="upload-hint">Select multiple MP3 files</p>
+                                </div>
+                            </div>
+
+                            <div id="batch-file-list" class="batch-file-list hidden"></div>
+
+                            <button id="process-batch-btn" class="btn btn-primary btn-block hidden">
+                                <span class="btn-icon">🚀</span>
+                                Process Batch
+                            </button>
+
+                            <div class="batch-progress hidden" id="batch-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progress-fill"></div>
+                                </div>
+                                <p id="progress-text">Processing...</p>
+                            </div>
+
+                            <!-- Batch Results -->
+                            <div id="batch-results" class="batch-results hidden"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 5: API Docs -->
+                    <div id="docs-tab" class="tab-pane">
+                        <div class="card">
+                            <h2 class="card-title">📖 API Documentation</h2>
+                            
+                            <div class="docs-section">
+                                <h3>Endpoint</h3>
+                                <pre class="code-block">POST /api/voice-detection</pre>
+                            </div>
+
+                            <div class="docs-section">
+                                <h3>Authentication</h3>
+                                <p>Add your API key in the request header:</p>
+                                <pre class="code-block">x-api-key: YOUR_API_KEY</pre>
+                            </div>
+
+                            <div class="docs-section">
+                                <h3>Request Body</h3>
+                                <pre class="code-block">{
+  "language": "Tamil",
+  "audioFormat": "mp3",
+  "audioBase64": "BASE64_ENCODED_AUDIO..."
+}</pre>
+                            </div>
+
+                            <div class="docs-section">
+                                <h3>Response (Success)</h3>
+                                <pre class="code-block">{
+  "status": "success",
+  "language": "Tamil",
+  "classification": "AI_GENERATED",
+  "confidenceScore": 0.91,
+  "explanation": "Unnatural pitch consistency detected"
+}</pre>
+                            </div>
+
+                            <div class="docs-section">
+                                <h3>Example with cURL</h3>
+                                <pre class="code-block">curl -X POST http://localhost:8000/api/voice-detection \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -d '{
+    "language": "English",
+    "audioFormat": "mp3",
+    "audioBase64": "..."
+  }'</pre>
+                            </div>
+
+                            <div class="docs-section">
+                                <h3>Example with JavaScript</h3>
+                                <pre class="code-block">const response = await axios.post('/api/voice-detection', {
+  language: 'English',
+  audioFormat: 'mp3',
+  audioBase64: audioBase64String
+}, {
+  headers: {
+    'x-api-key': 'YOUR_API_KEY'
+  }
+});
+
+console.log(response.data);</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>🎤 AI Voice Detection System | Powered by Advanced Machine Learning</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/app.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/recorder.js"></script>
+    <script src="js/fraud-analyzer.js"></script>
+    <script src="js/3d-visualizer.js"></script>
+</body>
+</html>
