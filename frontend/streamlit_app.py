@@ -297,8 +297,7 @@ with tab3:
         audio_data_fraud = mic_recorder(
             start_prompt="📞 Start Call",
             stop_prompt="📴 End Call",
-            key="fraud_recorder",
-            format="wav"
+            key="fraud_recorder"
         )
         
         if audio_data_fraud:
@@ -423,8 +422,7 @@ with tab2:
         audio_data = mic_recorder(
             start_prompt="Start Recording",
             stop_prompt="Stop Recording",
-            key="recorder",
-            format="wav"
+            key="recorder"
         )
         
         if audio_data:
